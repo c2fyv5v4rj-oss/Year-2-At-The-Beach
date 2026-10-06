@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>At the Beach — Year 2 Meme Edition</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(#62d9ff 0 48%,#f6d78b 48%);min-height:100vh;color:#17324d}
+.wrap{max-width:760px;margin:auto;padding:22px 14px}.card{background:#fff;border:4px solid #17324d;border-radius:28px;box-shadow:0 8px #17324d;padding:24px;text-align:center}
+h1{font-size:clamp(32px,8vw,55px);margin:8px}.emoji{font-size:60px}.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0}.badge{border:3px solid #17324d;border-radius:14px;padding:8px 12px;font-weight:900;background:#d9f8ff}
+button{font:inherit;font-weight:900;border:3px solid #17324d;border-radius:16px;padding:13px;box-shadow:0 5px #17324d;cursor:pointer}.start{width:100%;background:#ff78b7;font-size:20px}.sound{background:#ffe36e}.hidden{display:none}.q{font-size:23px;font-weight:900;margin:18px 0}.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.opt{background:#fff}.correct{background:#72e5a6}.wrong{background:#ff8c8c}.power{width:100%;margin-top:16px;background:#c79cff}.progress{height:15px;border:3px solid #17324d;border-radius:20px;overflow:hidden;background:#ddd}.bar{height:100%;background:#50d9a5;width:0}.lives{font-size:25px}.result{font-size:50px;font-weight:1000}input{width:100%;box-sizing:border-box;padding:13px;margin:5px 0;border:3px solid #17324d;border-radius:14px;font-size:17px}@media(max-width:560px){.options{grid-template-columns:1fr}}
+</style></head>
+<body><div class="wrap">
+<section id="start" class="card"><div class="emoji">🏖️🌊🌴🐚</div><h1>AT THE BEACH</h1><b>YEAR 2 ENGLISH • GEN Z MEME EDITION 💀</b>
+<div class="badges"><span class="badge">❤️ 3 LIVES</span><span class="badge">🔥 STREAK</span><span class="badge">🪄 POWER-UP</span></div>
+<button class="sound" id="snd" onclick="sound=!sound;snd.textContent=sound?'🔊 SOUND ON':'🔇 SOUND OFF'">🔊 SOUND ON</button>
+<button class="start" onclick="start()">🎮 START BEACH ADVENTURE</button></section>
+<section id="game" class="card hidden"><div class="badges"><span class="badge" id="part"></span><span class="badge">🏆 <span id="score">0</span>/100</span><span class="badge">🔥 <span id="streak">0</span></span></div>
+<div class="lives" id="lives">❤️ ❤️ ❤️</div><div class="progress"><div id="bar" class="bar"></div></div>
+<div id="emoji" class="emoji"></div><div id="q" class="q"></div><div id="opts" class="options"></div>
+<button id="power" class="power" onclick="usePower()">🪄 DISAPPEAR 1 WRONG ANSWER — 0</button></section>
+<section id="end" class="card hidden"><div class="emoji">🏖️😎✨</div><h2>BEACH ADVENTURE COMPLETE!</h2><div id="final" class="result">0/100</div><h2 id="msg"></h2>
+<input id="name" placeholder="Your Name"><input id="cls" placeholder="Class"><button class="start" onclick="save()">📋 SAVE RESULT</button><p id="saved"></p><button class="sound" onclick="location.reload()">🔄 PLAY AGAIN</button></section>
+</div>
+<script>
+const data=[
+["PART A • EASY","🏖️","Which word matches the picture?",["beach","school","library","kitchen"],"beach"],
+["PART A • EASY","🐚","What is this?",["shell","ball","hat","boat"],"shell"],
+["PART A • EASY","🕶️","Which word matches the picture?",["sunglasses","shoes","towel","umbrella"],"sunglasses"],
+["PART B • MEDIUM","🧴☀️","Choose the best sentence.",["I put on sunscreen.","I put on a book.","I put on a shell.","I put on the sea."],"I put on sunscreen."],
+["PART B • MEDIUM","🏊🌊","Choose the best sentence.",["I swim in the sea.","I read in the sea.","I eat the sea.","I wear the sea."],"I swim in the sea."],
+["PART B • MEDIUM","🪣🏖️","Choose the best sentence.",["I play with a bucket.","I swim with a bucket.","I wear a bucket.","I eat a bucket."],"I play with a bucket."],
+["PART C • HARD","👧🏖️🌊","Choose the correct sentence.",["She is swimming at the beach.","She are swimming at the beach.","She swimming at the beach.","She is swim at the beach."],"She is swimming at the beach."],
+["PART C • HARD","👦☀️🧴","Choose the correct sentence.",["He is putting on sunscreen.","He are putting on sunscreen.","He is put on sunscreen.","He putting on sunscreen."],"He is putting on sunscreen."],
+["PART C • HARD","👧🐚","Choose the correct sentence.",["She has a shell.","She have a shell.","She having a shell.","She is have a shell."],"She has a shell."],
+["PART C • HARD","👦🏖️⚽","Choose the best sentence.",["He is playing with a ball at the beach.","He are playing with a ball at the beach.","He is play with a ball at the beach.","He playing with a ball at the beach."],"He is playing with a ball at the beach."]];
+let n=0,sc=0,life=3,st=0,pow=0,sound=true,cur=[];
+function shuffle(a){a=[...a];for(let i=a.length-1;i;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function tone(f,d=.12){if(!sound)return;let C=AudioContext||webkitAudioContext,c=new C,o=c.createOscillator(),g=c.createGain();o.type="square";o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d)}
+function start(){tone(500);n=0;sc=0;life=3;st=0;pow=0;start.classList.add("hidden");game.classList.remove("hidden");show()}
+function show(){let x=data[n];cur=shuffle(x[3]);part.textContent=x[0];score.textContent=sc;streak.textContent=st;lives.textContent="❤️ ".repeat(life).trim();bar.style.width=n*10+"%";emoji.textContent=x[1];q.textContent=x[2];opts.innerHTML="";cur.forEach(v=>{let b=document.createElement("button");b.className="opt";b.textContent=v;b.onclick=()=>ans(b,v);opts.appendChild(b)});power.textContent="🪄 DISAPPEAR 1 WRONG ANSWER — "+pow;power.disabled=pow<1}
+function ans(b,v){let x=data[n];document.querySelectorAll(".opt").forEach(z=>z.disabled=true);if(v==x[4]){b.classList.add("correct");sc+=10;st++;tone(800);if(st==3){pow++;st=0;tone(1200)}}else{b.classList.add("wrong");life--;st=0;tone(100);document.querySelectorAll(".opt").forEach(z=>{if(z.textContent==x[4])z.classList.add("correct")})}score.textContent=sc;streak.textContent=st;lives.textContent="❤️ ".repeat(Math.max(life,0)).trim();setTimeout(()=>{if(life<=0||n==9)finish();else{n++;show()}},700)}
+function usePower(){if(!pow)return;pow--;let z=[...document.querySelectorAll(".opt")].filter(b=>b.textContent!=data[n][4]&&!b.disabled);if(z.length){let b=z[Math.floor(Math.random()*z.length)];b.style.visibility="hidden";b.disabled=true}power.textContent="🪄 DISAPPEAR 1 WRONG ANSWER — "+pow;power.disabled=pow<1;tone(1100)}
+function finish(){tone(1200);game.classList.add("hidden");end.classList.remove("hidden");final.textContent=sc+"/100";msg.textContent=sc==100?"🔥 PERFECT! YOU ATE THAT UP.":sc>=70?"😎 SLAY! BEACH PRO!":sc>=50?"💀 NOT BAD, BESTIE!":"😭 GO AGAIN — YOU GOT THIS!"}
+function save(){saved.textContent="✅ Result saved locally: "+(name.value||"Anonymous")+" • "+(cls.value||"—")+" • "+sc+"/100 ("+sc+"%)"}
+</script></body></html>
